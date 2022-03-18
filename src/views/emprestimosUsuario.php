@@ -72,7 +72,7 @@ if (!isset($_SESSION['email'])) {
                 $conexao = mysqli_connect("localhost", "root", "", "biblioteca");
                 $quantidadeLivros =  mysqli_fetch_array(mysqli_query($conexao, "SELECT COUNT(*) AS QUANTIDADE FROM EMPRESTIMO INNER JOIN LIVRO ON EMPRESTIMO.IDLIVRO = LIVRO.ID WHERE EMAILUSUARIO ='" . $_SESSION['email'] . "'"))['QUANTIDADE'];
                 if ($quantidadeLivros > 0) {
-                    $query = "SELECT TITULO, AUTORES, ANO, EDITORA FROM EMPRESTIMO INNER JOIN LIVRO ON EMPRESTIMO.IDLIVRO = LIVRO.ID WHERE EMAILUSUARIO ='" . $_SESSION['email'] . "'";
+                    $query = "SELECT ID, TITULO, AUTORES, ANO, EDITORA FROM EMPRESTIMO INNER JOIN LIVRO ON EMPRESTIMO.IDLIVRO = LIVRO.ID WHERE EMAILUSUARIO ='" . $_SESSION['email'] . "'";
                     $resultado = mysqli_query($conexao, $query);
                 ?>
                     <table class="w3-table-all">
@@ -87,7 +87,7 @@ if (!isset($_SESSION['email'])) {
                         </thead>
                         <?php
                         while ($linha = mysqli_fetch_array($resultado)) {
-                            echo "<tr><td>" . $linha['TITULO'] . "</td><td>" . $linha['AUTORES'] . "</td><td>" . $linha['ANO'] . "</td><td>" . $linha['EDITORA'] . "</td><td><button class=\"w3-button w3-white w3-border w3-round-large\">Devolver</button></td></tr>";
+                            echo "<tr><td>" . $linha['TITULO'] . "</td><td>" . $linha['AUTORES'] . "</td><td>" . $linha['ANO'] . "</td><td>" . $linha['EDITORA'] . "</td><td><button class=\"w3-button w3-white w3-border w3-round-large\"><a href=\"devolverLivro.php?idLivro=" . $linha['ID'] . "\">Devolver</a></button></td></tr>";
                         }
                         ?>
 

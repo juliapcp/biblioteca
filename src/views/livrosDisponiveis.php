@@ -1,5 +1,13 @@
 <?php
 
+function url($campo, $valor)
+{
+    $result = array();
+    if (isset($_GET["ano"])) $result["ano"] = "ano=" . $_GET["ano"];
+    if (isset($_GET["titulo"])) $result["titulo"] = "titulo=" . $_GET["titulo"];
+    $result[$campo] = $campo . "=" . $valor;
+    return ("livrosDisponiveis.php?" . strtr(implode("&", $result), " ", "+"));
+}
 session_cache_expire(30);
 $cache_expire = session_cache_expire();
 
@@ -64,29 +72,92 @@ if (!isset($_SESSION['email'])) {
             </div>
 
 
-            <div class="w3-container">
-                <br>
-                <table class="w3-table-all">
-                    <thead>
-                        <tr class="w3-red">
-                            <th>Título</th>
-                            <th>Autores</th>
-                            <th>Ano</th>
-                            <th>Editora</th>
-                            <th>Disponíveis</th>
-                            <th></th>
-                        </tr>
-                    </thead>
 
-                    <?php
-                    $conexao = mysqli_connect("localhost", "root", "", "biblioteca");
-                    $query = " SELECT distinct ID,TITULO,EDITORA,ANO,AUTORES,QUANTIDADE FROM LIVRO LEFT JOIN EMPRESTIMO ON LIVRO.ID=EMPRESTIMO.IDLIVRo where emailusuario is null or emailusuario <> '" . $_SESSION["email"] . "' AND QUANTIDADE>0;";
-                    $resultado = mysqli_query($conexao, $query);
-                    while ($linha = mysqli_fetch_array($resultado)) {
-                        echo "<tr><td>" . $linha['TITULO'] . "</td><td>" . $linha['AUTORES'] . "</td><td>" . $linha['ANO'] . "</td><td>" . $linha['EDITORA'] . "</td><td>" . $linha['QUANTIDADE'] . "</td><td><button class=\"w3-button w3-white w3-border w3-round-large\">Alugar</button></td></tr>";
-                    }
-                    ?>
-                </table>
+
+            <?php
+
+
+            echo "<select style=\"border:none\" id=\"campo\" name=\"campo\">\n";
+            echo "<option value=\"ano\"" . ((isset($_GET["ano"])) ? " selected" : "") . ">Ano</option>\n";
+            echo "<option value=\"titulo\"" . ((isset($_GET["titulo"])) ? " selected" : "") . ">Título</option>\n";
+            echo "</select>\n";
+
+            $value = "";
+
+            if (isset($_GET["ano"])) $value = $_GET["ano"];
+            if (isset($_GET["titulo"])) $value = $_GET["titulo"];
+            echo "<input class=\"w3-button w3-white w3-border w3-round-large\" type=\"text\" id=\"valor\" name=\"valor\" value=\"" . $value . "\" size=\"120\" pattern=\"[a-z\s]+$\"> \n";
+
+            echo '<script>';
+            echo 'var valor = document.querySelector("#valor");';
+            echo 'valor.addEventListener("input", function () {';
+            echo 'valor.value = valor.value.toUpperCase();';
+            echo '});';
+            echo '</script>';
+
+            $parameters = array();
+            echo "<a href=\"\" onclick=\"value = document.getElementById('valor').value.trim().replace(/ +/g, '+'); result = '" . strtr(implode("&", $parameters), " ", "+") . "'; result = ((value != '') ? document.getElementById('campo').value+'='+value+((result != '') ? '&' : '') : '')+result; this.href ='livrosDisponiveis.php'+((result != '') ? '?' : '')+result;\">&#x1F50E;</a><br>\n";
+            echo "<br>\n";
+
+            $where = array();
+
+            if (isset($_GET["ano"])) $where[] = "ano like '%" . strtr($_GET["ano"], " ", "%") . "%'";
+            if (isset($_GET["titulo"])) $where[] = "titulo like '%" . strtr($_GET["titulo"], " ", "%") . "%'";
+            $where = (count($where) > 0) ? " and " . implode(" and ", $where) : "";
+
+            ?>
+            <div class="w3-container">
+                <!-- <select name="campo" style="border:none"id="campo">
+                
+                    echo "<option " . ((isset($_GET["ano"])) ? " selected" : "") . " value=\"Ano\">Ano</option>";
+                    echo "<option " . ((isset($_GET["titulo"])) ? " selected" : "") . "value=\"Titulo\">Titulo</option>";
+                
+                </select>
+                
+                $valor = "";
+                // if (isset($_GET["ano"])) $valor = $_GET["ano"];
+                // if (isset($_GET["titulo"])) $valor = $_GET["titulo"];
+                $parameters = [];
+                // $url = isset($_GET["titulo"]) ? "livrosDisponiveis.php?titulo=". $_GET["titulo"] : 
+                // "livrosDisponiveis.php?ano=" . $_GET["ano"];
+                echo "<input class=\"w3-button w3-white w3-border w3-round-large\" type=\"text\" id=\"valor\" name=\"valor\" size=\"120\" pattern=\"[A-Z\s]+$\"> \n";
+                echo "<button class=\"w3-button w3-white w3-border w3-round-large\" size\"120\" onclick=\"value = document.getElementById('valor').value.trim().replace(/ +/g, '+'); result = '" . strtr(implode("&", $parameters), " ", "+") . "'; result = ((value != '') ? document.getElementById('campo').value+'='+value+((result != '') ? '&' : '') : '')+result; this.href ='livrosDisponiveis.php'+((result != '') ? '?' : '')+result;\">&#x1F50E;</button><br>\n";
+                -->
+                <br>
+                <br>
+
+                <?php
+                $conexao = mysqli_connect("localhost", "root", "", "biblioteca");
+                $queryQuantidade = "SELECT COUNT(ID) AS QUANTIDADE FROM (SELECT ID,TITULO,EDITORA,ANO,AUTORES,QUANTIDADE FROM LIVRO WHERE ID NOT IN (SELECT ID FROM LIVRO LEFT JOIN EMPRESTIMO ON LIVRO.ID = EMPRESTIMO.IDLIVRO WHERE EMAILUSUARIO='" . $_SESSION["email"] . "') " . $where . ") SUBQUERY";
+                $quantidadeLivros =  mysqli_fetch_array(mysqli_query($conexao, $queryQuantidade))['QUANTIDADE'];
+
+                if ($quantidadeLivros > 0) {
+                ?>
+                    <table class="w3-table-all">
+                        <thead>
+                            <tr class="w3-red">
+                                <th>Título</th>
+                                <th>Autores</th>
+                                <th>Ano</th>
+                                <th>Editora</th>
+                                <th>Disponíveis</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <?php
+                        $query = " SELECT ID,TITULO,EDITORA,ANO,AUTORES,QUANTIDADE FROM LIVRO WHERE ID NOT IN (SELECT ID FROM LIVRO LEFT JOIN EMPRESTIMO ON LIVRO.ID = EMPRESTIMO.IDLIVRO WHERE EMAILUSUARIO='" . $_SESSION["email"] . "') " . $where;
+                        $resultado = mysqli_query($conexao, $query);
+                        while ($linha = mysqli_fetch_array($resultado)) {
+                            echo "<tr><td>" . $linha['TITULO'] . "</td><td>" . $linha['AUTORES'] . "</td><td>" . $linha['ANO'] . "</td><td>" . $linha['EDITORA'] . "</td><td>" . $linha['QUANTIDADE'] . "</td><td><button class=\"w3-button w3-white w3-border w3-round-large\"><a href=\"alugarLivro.php?idLivro=" . $linha['ID'] . "\">Alugar</a></button></td></tr>";
+                        }
+                        ?>
+                    </table>
+                <?php
+
+                } else {
+                    echo '<p class="w3-xlarge ">Que pena, não tem nenhum livro aqui.</p>';
+                }
+                ?>
             </div>
             <br><br><br><br>
 
