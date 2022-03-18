@@ -34,21 +34,22 @@ if (!isset($_SESSION['email'])) {
             <div class="w3-bar-block">
                 <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a>
                 <a href="#servicos" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Serviços</a>
+                <a href="./livrosDisponiveis.php" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">&#187; Empréstimo de Livros</a>
                 <a href="#autores" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Autores</a>
                 <br><br><br>
                 <br><br><br>
                 <br><br>
                 <?php
                 $conexao = mysqli_connect("localhost", "root", "", "biblioteca");
-                $nomeUsuario =  mysqli_fetch_array(mysqli_query($conexao, "SELECT NOME FROM USUARIO WHERE EMAIL='". $_SESSION['email'] ."'"))['NOME'];
-                echo '<p class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-user-o" aria-hidden="true"></i></i> '.$nomeUsuario.'</p>';
+                $nomeUsuario =  mysqli_fetch_array(mysqli_query($conexao, "SELECT NOME FROM USUARIO WHERE EMAIL='" . $_SESSION['email'] . "'"))['NOME'];
+                echo '<p class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-user-o" aria-hidden="true"></i></i><a href="./emprestimosUsuario.php"> ' . $nomeUsuario . '</a></p>';
                 ?>
 
                 <a href="./logout.php" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-sign-out"></i> Sair</a>
             </div>
         </nav>
 
-    <header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
+        <header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
             <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
             <span>Estante Virtual</span>
         </header>
@@ -58,7 +59,7 @@ if (!isset($_SESSION['email'])) {
 
         <div class="w3-main" style="margin-left:340px;margin-right:40px">
 
-    
+
             <div class="w3-container" style="margin-top:80px" id="showcase">
                 <h1 class="w3-jumbo"><b>Estante Virtual</b></h1>
                 <h1 class="w3-xxxlarge w3-text-red"><b>Propósito</b></h1>
@@ -76,7 +77,7 @@ if (!isset($_SESSION['email'])) {
 
             <div class="w3-container" id="servicos" style="margin-top:75px">
                 <h1 class="w3-xxxlarge w3-text-red"><b>Serviços</b></h1>
-
+                <li class="w3-xxlarge w3-text-red"><b><a href="./livrosDisponiveis.php">Empréstimo de livros</a></b></h3>
             </div>
 
             <div class="w3-container" id="autores" style="margin-top:75px">
