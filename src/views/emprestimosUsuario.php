@@ -39,7 +39,7 @@ if (!isset($_SESSION['email'])) {
                 <?php
                 $conexao = mysqli_connect("localhost", "root", "", "biblioteca");
                 $nomeUsuario =  mysqli_fetch_array(mysqli_query($conexao, "SELECT NOME FROM USUARIO WHERE EMAIL='" . $_SESSION['email'] . "'"))['NOME'];
-                echo '<p class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-user-o" aria-hidden="true"></i></i><a href="./emprestimosUsuario.php"> ' . $nomeUsuario . '</a></p>';
+                echo '<p class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-user-o" aria-hidden="true" title="Visualizar meus livros"></i></i><a href="./emprestimosUsuario.php"> ' . $nomeUsuario . '</a></p>';
                 ?>
 
                 <a href="./logout.php" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"><i class="fa fa-sign-out"></i> Sair</a>
